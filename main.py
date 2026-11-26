@@ -22,11 +22,14 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "entry.txt").write_text(ENTRY, encoding="utf-8")
     # Self-check gate: output must be exactly the intended entry,
-    # 1-200 chars, non-whitespace. Raises if anything drifts.
+    # a single line of 1-200 chars, non-whitespace. Raises if anything
+    # drifts, so a bad edit can never ship a malformed entry.
     written = (out_dir / "entry.txt").read_text(encoding="utf-8")
     assert written == ENTRY, "entry.txt does not match ENTRY"
     assert 1 <= len(written) <= 200, "entry length out of gate range"
     assert written.strip(), "entry is only whitespace"
+    assert "\n" not in written, "entry must be a single line"
+    assert written == written.strip(), "entry must not start/end with space"
 
 
 if __name__ == "__main__":
